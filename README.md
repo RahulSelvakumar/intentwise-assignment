@@ -41,10 +41,6 @@ tailored to one API:
 | Rick and Morty API | None | next-URL in body (`info.next`) | `{info, results}` |
 | NASA APOD API | API key in query param | none (batch via `count`) | bare array |
 
-(WeatherAPI was the original plan for the api-key-in-query style; its key
-was still activating during the build window, so NASA's APOD API — same
-auth style, instant `DEMO_KEY` — was substituted. Swapping back is a
-one-file YAML change.)
 
 ## Architecture
 
@@ -136,6 +132,3 @@ headers (e.g. `Authorization`) take precedence. Exactly the kind of
 live-API-only failure mode the assignment calls out — invisible with mocked
 tests, only visible against a real production server.
 
-## Repo access
-
-`hrintentwise` has been invited with read-only access.
