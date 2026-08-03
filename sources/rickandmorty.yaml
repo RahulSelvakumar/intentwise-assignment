@@ -1,0 +1,23 @@
+# Rick and Morty API demo source.
+# Auth: none (fully public, no key required).
+# Pagination: cursor/next-URL embedded in the JSON response body
+#             (info.next), structurally different from GitHub's header-based
+#             pagination -- proves the design isn't tailored to one style.
+name: rickandmorty_characters
+base_url: https://rickandmortyapi.com
+auth:
+  type: none
+pagination:
+  type: cursor_body
+  next_url_path: info.next
+  max_pages: 10
+request:
+  method: GET
+  path: /api/character
+  timeout_seconds: 15
+response:
+  records_path: results
+  external_id_path: id
+destination:
+  type: database
+  table: raw_records

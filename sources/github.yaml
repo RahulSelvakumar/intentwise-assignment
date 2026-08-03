@@ -1,0 +1,27 @@
+# GitHub REST API demo source.
+# Auth: bearer token (optional for public read-only endpoints, but included to
+#       demonstrate real credential handling + rate-limit header awareness).
+# Pagination: Link header (rel="next"), the standard GitHub pagination style.
+name: github_issues
+base_url: https://api.github.com
+auth:
+  type: bearer_token
+  env_var: GITHUB_TOKEN
+pagination:
+  type: link_header
+  max_pages: 5
+request:
+  method: GET
+  path: /repos/octocat/Hello-World/issues
+  headers:
+    Accept: application/vnd.github+json
+  query_params:
+    state: all
+    per_page: "30"
+  timeout_seconds: 15
+response:
+  records_path: ""   # top-level response is already a JSON array of issues
+  external_id_path: id
+destination:
+  type: database
+  table: raw_records

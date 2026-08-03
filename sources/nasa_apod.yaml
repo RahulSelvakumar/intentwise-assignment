@@ -1,0 +1,29 @@
+# NASA APOD (Astronomy Picture of the Day) API -- demo source added purely
+# via config, no code changes, chosen as a fast-to-verify stand-in while a
+# WeatherAPI key finishes activating. Proves the same "api key in query
+# param" auth style WeatherAPI would have used.
+# Auth: API key in a query parameter. NASA's public DEMO_KEY works
+#       instantly with no signup/activation delay (rate-limited but fine
+#       for a demo). Swap in a real NASA_API_KEY env var for higher limits.
+# Pagination: none -- requesting `count` returns a fixed-size array in one
+#             call; no next-page concept.
+name: nasa_apod
+base_url: https://api.nasa.gov
+auth:
+  type: api_key_query
+  param_name: api_key
+  env_var: NASA_API_KEY
+pagination:
+  type: none
+request:
+  method: GET
+  path: /planetary/apod
+  query_params:
+    count: "10"
+  timeout_seconds: 15
+response:
+  records_path: ""   # top-level response is already a JSON array
+  external_id_path: date
+destination:
+  type: database
+  table: raw_records
