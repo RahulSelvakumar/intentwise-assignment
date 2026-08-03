@@ -59,6 +59,7 @@ tailored to one API:
 | Rick and Morty API | None | next-URL in body (`info.next`) | `{info, results}` |
 | NASA APOD API | API key in query param | none (batch via `count`) | bare array |
 
+
 ## Architecture
 
 ```mermaid
