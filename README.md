@@ -11,12 +11,14 @@ Built for the Intentwise "AI-Native Software Engineer" take-home assignment.
 git clone <this-repo> && cd intentwise-ingestion
 cp .env.example .env   # add GITHUB_TOKEN if you want authenticated GitHub calls
 docker compose up -d --build
+docker compose ps      # wait until both services show healthy/running
 ```
 
 Two containers start: `db` (Postgres) and `app` (FastAPI on `:8000`). Schema
-is created automatically on startup.
+is created automatically on startup — no manual migration step.
 
 ```bash
+curl http://localhost:8000/health                                   # confirm it's up
 curl http://localhost:8000/sources                                  # list configured sources
 curl -X POST http://localhost:8000/sources/github_issues/ingest     # trigger a run
 curl -X POST http://localhost:8000/sources/rickandmorty_characters/ingest
@@ -25,10 +27,26 @@ curl http://localhost:8000/runs/1                                   # run status
 curl http://localhost:8000/runs/1/records                           # sample stored records
 ```
 
-Docs: `http://localhost:8000/docs`. Tests: `docker compose exec app pytest -q`.
+Interactive API docs (Swagger UI): `http://localhost:8000/docs`.
+
+Run the automated test suite (34 tests: auth, pagination, extractor, fetcher):
+
+```bash
+docker compose exec app pytest -q
+```
+
+Inspect the database directly, if desired:
+
+```bash
+docker compose exec db psql -U ingestion -d ingestion \
+  -c "SELECT source_name, count(*) FROM raw_records GROUP BY source_name;"
+```
+
+Shut down when done: `docker compose down` (add `-v` to also wipe the DB volume).
 
 **New source, no code changes:** drop a YAML file in `sources/` (see
-existing ones as templates) and `docker compose restart app`.
+existing ones as templates), then `docker compose restart app` and it
+appears in `GET /sources` automatically.
 
 ## Demo APIs
 
@@ -40,11 +58,6 @@ tailored to one API:
 | GitHub Issues API | Bearer token | `Link` header (`rel="next"`) | bare array |
 | Rick and Morty API | None | next-URL in body (`info.next`) | `{info, results}` |
 | NASA APOD API | API key in query param | none (batch via `count`) | bare array |
-
-(WeatherAPI was the original plan for the api-key-in-query style; its key
-was still activating during the build window, so NASA's APOD API — same
-auth style, instant `DEMO_KEY` — was substituted. Swapping back is a
-one-file YAML change.)
 
 ## Architecture
 
@@ -136,6 +149,3 @@ headers (e.g. `Authorization`) take precedence. Exactly the kind of
 live-API-only failure mode the assignment calls out — invisible with mocked
 tests, only visible against a real production server.
 
-## Repo access
-
-`hrintentwise` has been invited with read-only access.
